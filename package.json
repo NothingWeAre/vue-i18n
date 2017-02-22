@@ -7,7 +7,7 @@
     "email": "matt.radford.unr@gmail.com"
   },
   "repository": {
-    "url": "git+https://github.com/MattyRad/vue-i18n.git"
+    "url": "git+https://github.com/NothingWeAre/vue-i18n.git"
   },
   "license": "MIT",
   "main": "src/main.js",
