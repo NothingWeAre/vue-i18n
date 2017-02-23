@@ -1,37 +1,50 @@
-import { replace } from './format'
-import { set, fetch } from './translations'
+import {replace} from './format'
+import {set, fetch} from './translations'
+
+const options = {
+  locale: '',
+};
+
+const translator = function(key, replacements = {}) {
+
+  let locale      = replacements['locale'] || options.locale;
+  let translation = fetch(locale, key);
+
+  return replace(translation, replacements)
+};
+
+translator.setLocale = function(locale) {
+  options.locale = locale;
+};
+
+export const translate = translator;
 
 export default {
-  install: function (Vue, translations = {}) {
+  install: function(Vue, data) {
 
-    set(translations);
+    set(data.translations);
+    options.locale = data.locale;
 
     Vue.directive('locale', {
       params: ['key', 'replace'],
 
-      update: function (locale) {
-        var translated_substrings = this.vm.$t(this.params.key, this.params.replace).split('|');
+      update: function(locale) {
+        let translated_substrings = translator(this.params.key, this.params.replace).split('|');
 
-        var children = this.el.children;
+        let children = this.el.children;
 
-        for (var i = 0; i < children.length; i++) {
+        for(let i = 0; i < children.length; i++){
           if (translated_substrings[i]) {
             children[i].innerText = translated_substrings[i];
           }
         }
       }
-    })
+    });
 
-    Vue.prototype.$t = function (key, replacements = {}) {
-      var locale = replacements['locale'] || this.$root.locale
+    Vue.prototype.$t = translator;
 
-      var translation = fetch(locale, key)
-
-      return replace(translation, replacements)
-    }
-
-    Vue.filter('translate', function (key, replacements = {}) {
-      return this.$t(key, replacements)
+    Vue.filter('translate', function(key, replacements = {}) {
+      return translator(key, replacements)
     })
   }
 }
